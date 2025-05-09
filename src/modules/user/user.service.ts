@@ -1,23 +1,57 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Op } from 'sequelize';
+import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { User } from "./model";
-import { CreateUserDto } from "./dtos";
+import { CreateUserDto, GetAllUsersDto } from "./dtos";
 import { FsHelper } from "src/helper/fs.helper";
 import { UpdateUserDto } from "./dtos/update.user.dto";
+import { SortOrder, UserRole } from "./enums";
+import * as bcrypt from "bcryptjs"
 
 @Injectable()
 
-export class UserService {
+export class UserService implements OnModuleInit {
     constructor(@InjectModel(User) private userModel: typeof User, private fs: FsHelper) { }
 
-    async getAll() {
-        const users = await this.userModel.findAll();
-        return {
-            message: "Barcha foydalanuvchilar",
-            count: users.length,
-            data: users
-        };
+    async onModuleInit() {
+        await this.#_seedUsers()
     }
+
+    async getAll(query: GetAllUsersDto) {
+        const { name, role, sortField, sortOrder, page = 1, limit = 10 } = query;
+        const offset = (page - 1) * limit;
+      
+        const where: Record<string, any> = {}; 
+      
+        if (name) {
+          where.name = { [Op.iLike]: `%${name}%` };
+        }
+      
+        if (role) {
+          where.role = role;
+        }
+      
+        const order: [string, SortOrder][] = [];
+      
+        if (sortField && sortOrder) {
+          order.push([sortField, sortOrder]);
+        }
+      
+        const users = await this.userModel.findAll({
+          where,
+          limit,
+          offset,
+          order: order.length ? order : undefined,
+        });
+      
+        return {
+          message: "Barcha foydalanuvchilar",
+          count: users.length,
+          page,
+          limit,
+          data: users,
+        };
+      }
 
     async getById(id: number) {
         const user = await this.userModel.findOne({ where: { id } });
@@ -30,19 +64,19 @@ export class UserService {
         }
     }
 
-
-
     async createUser(payload: CreateUserDto) {
 
         const fileName = payload.image ? await this.fs.uploadFile(payload.image) : null;
         const fileUrl = fileName?.fileUrl.split("\\").at(-1)
+        const passwordHash = bcrypt.hashSync(payload.password);
         const newUser = await this.userModel.create(
             {
                 name: payload.name,
                 email: payload.email,
                 age: payload.age,
-                password: payload.password,
-                image: fileUrl
+                password: passwordHash,
+                image: fileUrl,
+                role: payload.role,
 
             })
         return {
@@ -62,8 +96,10 @@ export class UserService {
         if (payload.name) updatedUserData.name = payload.name;
         if (payload.email) updatedUserData.email = payload.email;
         if (payload.age) updatedUserData.age = payload.age;
-        if (payload.password) updatedUserData.password = payload.password;
-
+        if (payload.password) {
+            const passwordHash = bcrypt.hashSync(payload.password);
+            updatedUserData.password = passwordHash;
+        }
         await this.userModel.update(updatedUserData, { where: { id } });
 
         const updatedUser = await this.userModel.findOne({ where: { id } });
@@ -102,21 +138,48 @@ export class UserService {
 
     async deleteUser(id: number) {
         const user = await this.userModel.findOne({ where: { id } });
-    
+
         if (!user) {
             throw new NotFoundException(`ID: ${id} bo'yicha foydalanuvchi topilmadi!`);
         }
-    
+
         if (user?.dataValues?.image) {
             await this.fs.deleteFile(user?.dataValues?.image);
 
         }
 
         await this.userModel.destroy({ where: { id } });
-    
+
         return {
             message: "Foydalanuvchi o'chirildi ✅",
         };
     }
-    
+
+    async #_seedUsers() {
+        const users = [
+            {
+                name: 'Tom',
+                email: 'tom@gmail.com',
+                password: 'tom123',
+                role: UserRole.SUPER_ADMIN,
+            },
+        ];
+
+        for (let user of users) {
+            const newUser = await this.userModel.findOne({ where: { email: user.email } });
+
+            if (!newUser) {
+                const passwordHash = bcrypt.hashSync(user.password);
+                await this.userModel.create({
+                    name: user.name,
+                    email: user.email,
+                    password: passwordHash,
+                    role: user.role,
+                });
+            }
+        }
+
+        console.log('Adminlar yaratildi ✅');
+    }
+
 }

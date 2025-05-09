@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from './modules/user';
+import { APP_GUARD } from '@nestjs/core';
+import { CheckAuthGuard, CheckRolesGuard } from './guards';
 
 
 @Module({
@@ -21,8 +23,17 @@ import { UserModel } from './modules/user';
     },
     autoLoadModels: true,
   }),
-  UserModel
-],
-
+    UserModel
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: CheckAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CheckRolesGuard,
+    },
+  ],
 })
 export class AppModule { }

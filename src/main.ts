@@ -7,6 +7,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('User Api')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   if (process.env?.NODE_ENV?.trim() === "development") {

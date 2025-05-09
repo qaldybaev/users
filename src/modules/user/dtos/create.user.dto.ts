@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { UserRole } from "../enums";
 
 export class CreateUserDto {
     @ApiProperty({ type: String, default: "Nurken" })
@@ -21,4 +22,14 @@ export class CreateUserDto {
     @ApiProperty({ type: String, format: "binary", required: false })
     @IsOptional()
     image?: Express.Multer.File;
+
+    @ApiProperty({
+        type: 'string',
+        enum: UserRole,
+        default: UserRole.USER,
+        required: false,
+    })
+    @IsOptional()
+    @IsEnum(UserRole)
+    role?: UserRole;
 }
