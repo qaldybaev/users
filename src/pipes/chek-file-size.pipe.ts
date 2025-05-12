@@ -8,7 +8,7 @@ export class CheckFileSizePipe implements PipeTransform {
     }
     transform(value: Express.Multer.File, metadata: ArgumentMetadata) {
         if (!value) {
-            throw new ConflictException(`Rasm yuborilmadi!`)
+            return value
         }
         if (value.size > this.limit) {
             throw new ConflictException(`Rasm hajmi ${this.limit / 1024 / 1024} mb kichik bolishi kerak!`)

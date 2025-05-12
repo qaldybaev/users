@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { User } from "./model";
 import { CreateUserDto, GetAllUsersDto } from "./dtos";
@@ -20,38 +20,38 @@ export class UserService implements OnModuleInit {
     async getAll(query: GetAllUsersDto) {
         const { name, role, sortField, sortOrder, page = 1, limit = 10 } = query;
         const offset = (page - 1) * limit;
-      
-        const where: Record<string, any> = {}; 
-      
+
+        const where: Record<string, any> = {};
+
         if (name) {
-          where.name = { [Op.iLike]: `%${name}%` };
+            where.name = { [Op.iLike]: `%${name}%` };
         }
-      
+
         if (role) {
-          where.role = role;
+            where.role = role;
         }
-      
+
         const order: [string, SortOrder][] = [];
-      
+
         if (sortField && sortOrder) {
-          order.push([sortField, sortOrder]);
+            order.push([sortField, sortOrder]);
         }
-      
+
         const users = await this.userModel.findAll({
-          where,
-          limit,
-          offset,
-          order: order.length ? order : undefined,
+            where,
+            limit,
+            offset,
+            order: order.length ? order : undefined,
         });
-      
+
         return {
-          message: "Barcha foydalanuvchilar",
-          count: users.length,
-          page:Number(page),
-          limit:Number(limit),
-          data: users,
+            message: "Barcha foydalanuvchilar",
+            count: users.length,
+            page: Number(page),
+            limit: Number(limit),
+            data: users,
         };
-      }
+    }
 
     async getById(id: number) {
         const user = await this.userModel.findOne({ where: { id } });
@@ -68,6 +68,10 @@ export class UserService implements OnModuleInit {
 
         const fileName = payload.image ? await this.fs.uploadFile(payload.image) : null;
         const fileUrl = fileName?.fileUrl.split("\\").at(-1)
+        const founded = await this.userModel.findOne({ where: { email: payload.email } })
+        if (founded) {
+            throw new BadRequestException('Bunday email bilan foydalanuvchi allaqachon mavjud!');
+        }
         const passwordHash = bcrypt.hashSync(payload.password);
         const newUser = await this.userModel.create(
             {
@@ -90,7 +94,10 @@ export class UserService implements OnModuleInit {
         if (!user) {
             throw new NotFoundException(`ID: ${id} boyicha foudalanuvchi topilmadi!`);
         }
-
+        const founded = await this.userModel.findOne({ where: { email: payload.email } })
+        if (founded) {
+            throw new BadRequestException('Bunday email bilan foydalanuvchi allaqachon mavjud!');
+        }
         const updatedUserData: any = {};
 
         if (payload.name) updatedUserData.name = payload.name;
