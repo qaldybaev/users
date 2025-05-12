@@ -41,7 +41,7 @@ import { UserRole } from 'src/modules/user/enums';
       }
   
       const token = request.headers['authorization'];
-      console.log(token)
+    
   
       if (!token || !token.startsWith('Bearer')) {
         throw new BadRequestException('Iltimos Bearer token yuboring');

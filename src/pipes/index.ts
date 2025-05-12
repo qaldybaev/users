@@ -1,0 +1,1 @@
+export * from "./chek-file-size.pipe"

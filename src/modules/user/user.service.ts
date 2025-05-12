@@ -47,8 +47,8 @@ export class UserService implements OnModuleInit {
         return {
           message: "Barcha foydalanuvchilar",
           count: users.length,
-          page,
-          limit,
+          page:Number(page),
+          limit:Number(limit),
           data: users,
         };
       }

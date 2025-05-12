@@ -18,6 +18,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { Protected, Roles } from 'src/decorators';
 import { UserRole } from './enums';
+import { CheckFileSizePipe } from 'src/pipes';
+import { CheckFilePathPipe } from 'src/pipes/check-file-path.pipe';
 
 @Controller('users')
 export class UserController {
@@ -48,7 +50,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor("image"))
   @ApiConsumes("multipart/form-data")
   @ApiOperation({ summary: 'Yangi foydalanuvchi yaratish' })
-  async create(@Body() body: CreateUserDto, @UploadedFile() image?: Express.Multer.File) {
+  async create(@Body() body: CreateUserDto, @UploadedFile(new CheckFileSizePipe(2), new CheckFilePathPipe(["png", "jpg", "jpeg"])) image?: Express.Multer.File) {
     return await this.userService.createUser({ ...body, image });
   }
 
@@ -68,7 +70,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor("image"))
   @ApiConsumes("multipart/form-data")
   @ApiOperation({ summary: 'Foydalanuvchi rasmni yangilash' })
-  async updateImage(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserImageDto, @UploadedFile() image: Express.Multer.File) {
+  async updateImage(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserImageDto, @UploadedFile(new CheckFileSizePipe(1), new CheckFilePathPipe(["png", "jpg", "jpeg"])) image: Express.Multer.File) {
     return await this.userService.updateUserImage(id, image);
   }
 

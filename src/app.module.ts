@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from './modules/user';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { CheckAuthGuard, CheckRolesGuard } from './guards';
+import { CheckFileSizePipe } from './pipes';
 
 
 @Module({
@@ -33,7 +34,8 @@ import { CheckAuthGuard, CheckRolesGuard } from './guards';
     {
       provide: APP_GUARD,
       useClass: CheckRolesGuard,
-    },
+    }
+    
   ],
 })
 export class AppModule { }
