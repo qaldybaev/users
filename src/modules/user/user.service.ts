@@ -18,10 +18,10 @@ export class UserService implements OnModuleInit {
     }
 
     async getAll(query: GetAllUsersDto) {
-        const { name, role, sortField, sortOrder, page = 1, limit = 10 } = query;
+        const { name, role, sortField, sortOrder, page = 1, limit = 10, fileds } = query;
         const offset = (page - 1) * limit;
 
-        const where: Record<string, any> = {};
+        const where:any = {};
 
         if (name) {
             where.name = { [Op.iLike]: `%${name}%` };
@@ -42,6 +42,7 @@ export class UserService implements OnModuleInit {
             limit,
             offset,
             order: order.length ? order : undefined,
+            attributes: fileds
         });
 
         return {

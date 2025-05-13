@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from './modules/user';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { CheckAuthGuard, CheckRolesGuard } from './guards';
-import { CheckFileSizePipe } from './pipes';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as  path from 'node:path';
 
 
 @Module({
@@ -24,6 +25,10 @@ import { CheckFileSizePipe } from './pipes';
     },
     autoLoadModels: true,
   }),
+  ServeStaticModule.forRoot({
+    rootPath: path.join(process.cwd(), "uploads"),
+    serveRoot: "/uploads"
+  }),
     UserModel
   ],
   providers: [
@@ -35,7 +40,7 @@ import { CheckFileSizePipe } from './pipes';
       provide: APP_GUARD,
       useClass: CheckRolesGuard,
     }
-    
+
   ],
 })
 export class AppModule { }

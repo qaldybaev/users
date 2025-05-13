@@ -1,21 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import {  ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix("/api")
   app.useGlobalPipes(new ValidationPipe({
     forbidNonWhitelisted: true,
     whitelist: true,
-    exceptionFactory(errors) {
-      let errorMsg = ""
-      errors.forEach((err) => {
-        errorMsg += `${Object.values(err.constraints as object).join(',')}, `;
-      })
-      throw new BadRequestException(errorMsg)
-    },
-  }))
+    transform: true,
+  }
+  ))
   const config = new DocumentBuilder()
     .setTitle('User Api')
     .setVersion('1.0')
@@ -25,6 +22,8 @@ async function bootstrap() {
   if (process.env?.NODE_ENV?.trim() === "development") {
     SwaggerModule.setup('doc', app, documentFactory);
   }
+  app.useGlobalFilters(new HttpExceptionFilter)
+
   const PORT = process.env.APP_PORT ? Number(process.env.APP_PORT) : 4000
   await app.listen(PORT, () => {
     console.log(`Server is running http://localhost:${PORT}`)
