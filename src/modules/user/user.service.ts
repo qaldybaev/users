@@ -3,7 +3,7 @@ import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from
 import { InjectModel } from "@nestjs/sequelize";
 import { User } from "./model";
 import { CreateUserDto, GetAllUsersDto } from "./dtos";
-import { FsHelper } from "src/helper/fs.helper";
+import { FsHelper } from "../../helper/fs.helper";
 import { UpdateUserDto } from "./dtos/update.user.dto";
 import { SortOrder, UserRole } from "./enums";
 import * as bcrypt from "bcryptjs"

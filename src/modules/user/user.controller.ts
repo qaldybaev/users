@@ -16,12 +16,12 @@ import { UserService } from './user.service';
 import { CreateUserDto, GetAllUsersDto, UpdateUserDto, UpdateUserImageDto } from './dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { Protected, Roles } from 'src/decorators';
+import { Protected, Roles } from '../../decorators/index';
 import { UserRole } from './enums';
-import { CheckFileSizePipe } from 'src/pipes';
-import { CheckFilePathPipe } from 'src/pipes/check-file-path.pipe';
+import { CheckFileSizePipe,CheckFilePathPipe } from '../../pipes/index';
 
-@Controller('users')
+
+@Controller({ path: 'users', version: "2" })
 export class UserController {
   constructor(private readonly userService: UserService) { }
 

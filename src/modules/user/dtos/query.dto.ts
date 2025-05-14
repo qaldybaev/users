@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, IsInt, Min, Max, IsArray } from 'class-validator';
-import { SortOrder, UserRole } from 'src/modules/user/enums';
+import { SortOrder, UserRole } from '../enums/index';
 
 const acceptedFields = [
     'id',
