@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDto, RegisterDto } from "./dtos";
-import { Protected, Roles } from "src/decorators";
+import { Protected, Roles } from "../../decorators/index";
 import { UserRole } from "./enums";
 import { ApiOperation } from "@nestjs/swagger";
 

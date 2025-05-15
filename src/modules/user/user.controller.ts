@@ -70,7 +70,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor("image"))
   @ApiConsumes("multipart/form-data")
   @ApiOperation({ summary: 'Foydalanuvchi rasmni yangilash' })
-  async updateImage(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserImageDto, @UploadedFile(new CheckFilePathPipe(["png", "jpg", "jpeg"]), new CheckFileSizePipe(1)) image: Express.Multer.File) {
+  async updateImage(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserImageDto, @UploadedFile() image: Express.Multer.File) {
     return await this.userService.updateUserImage(id, image);
   }
 

@@ -11,8 +11,8 @@ import {
   import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
   import { Request } from 'express';
   import { Observable } from 'rxjs';
-  import { PROTECTED_KEY } from 'src/decorators';
-import { UserRole } from 'src/modules/user/enums';
+  import { PROTECTED_KEY } from '../decorators/index';
+import { UserRole } from '../modules/user/enums';
 
   
   @Injectable()

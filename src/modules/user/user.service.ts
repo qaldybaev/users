@@ -129,7 +129,7 @@ export class UserService implements OnModuleInit {
             await this.fs.deleteFile(user?.dataValues?.image);
 
         }
-
+        
         const fileName = await this.fs.uploadFile(image);
         const fileUrl = fileName?.fileUrl.split("\\").at(-1);
 

@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './model';
-import { FsHelper } from 'src/helper/fs.helper';
+import { FsHelper } from '../../helper/fs.helper';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
